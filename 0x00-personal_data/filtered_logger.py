@@ -1,70 +1,12 @@
 #!/usr/bin/env python3
-"""Module filters logs"""
+"""filtered logger module"""
 import os
+from typing import List
 import re
 import logging
-import mysql.connector
-from typing import List
+from mysql import connector
 
-patterns = {
-    'extract': lambda x, y: r'(?P<field>{})=[^{}]*'.format('|'.join(x), y),
-    'replace': lambda x: r'\g<field>={}'.format(x),
-}
-
-PII_FIELDS = ("name", "email", "phone","ssn", "password")
-
-def filter_datum(
-        fields: List[str], reduction: str, message: str, separator: str,
-        ) -> str:
-    """Filters log line"""
-    extract, replace = (patterns["extract"], patterns["replace"])
-    return re.sub(extract(fields, separator), replace(reduction), message)
-
-def get_logger() -> logging.Logger:
-    """Creates new logger for user data"""
-    logger = logging.getLogger("user_data")
-    str_handler = logging.StreamHandler()
-    str_handler.setFormatter(RedactingFormatter(PII_FIELDS))
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
-    logger.addHandler(str_handler)
-    return logger
-
-def get_db() -> mysql.connector.connection.MySQLConnection:
-    """Connector to MySQL database"""
-    db_host = os.getenv("PERSONAL_DATA_DB_HOST","localhost")
-    db_name = os.getenv("PERSONAL_DATA_DB_NAME","")
-    db_user = os.getenv("PERSONAL_DATA_DB_USERNAME","root")
-    db_pwd = os.getenv("PERSONAL_DATA_DB_PASSWORD","")
-    connection = mysql.connector.connect(
-        host=db_host,
-        port=3306,
-        user=db_user,
-        password=db_pwd,
-        database=db_name,
-    )
-    return connection
-
-def main():
-    """ Logs the information about user records in a table"""
-    fields = "name,email,phone,ssn,password,ip,last_login,user_agent"
-    columns = fields.split(',')
-    query = "SELECT {} FROM users".format(fields)
-    info_logger = get_logger()
-    connection = get_db()
-    with connection.cursor() as cursor:
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        for row in rows:
-            record = map(
-                lambda x: '{}={}'.format(x[0], x[1]),
-                zip(columns, row),
-            )
-            msg = '{};'.format(';'.join(list(record)))
-            args = ("user_data", logging.INFO, None, None, msg, None, None)
-            log_record = logging.LogRecord(*args)
-            info_logger.handle(log_record)
-
+PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
 
 
 class RedactingFormatter(logging.Formatter):
@@ -73,19 +15,74 @@ class RedactingFormatter(logging.Formatter):
 
     REDACTION = "***"
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
-    FORMAT_FIELDS = ('name', 'level', 'asctime', 'message')
     SEPARATOR = ";"
 
     def __init__(self, fields: List[str]):
-        super(RedactingFormatter, self).__init__(self.FORMAT)
         self.fields = fields
+        super(RedactingFormatter, self).__init__(self.FORMAT)
 
     def format(self, record: logging.LogRecord) -> str:
-        """ formats a LogRecord"""
-        msg = super(RedactingFormatter, self).format(record)
-        txt = filter_datum(self.fields, self.REDACTION, msg, self.SEPARATOR)
-        return txt
+        """format a record"""
+        filtered = filter_datum(self.fields, self.REDACTION, record.getMessage(), self.SEPARATOR)  # nopep8
+        log_record = logging.LogRecord("my_logger", logging.INFO, None, None, filtered, None, None)  # nopep8
+        formatter = logging.Formatter(self.FORMAT)
+        return formatter.format(log_record)
 
 
-if __name__ == "__main__":
+def filter_datum(fields: List[str], redaction: str, message: str, separator: str) -> str:  # nopep8
+    """filter user data function"""
+    for field in fields:
+        sub_pattern = fr'{field}.*?(?={separator})'
+        message = re.sub(sub_pattern, f'{field}={redaction}', message)
+    return message
+
+
+def get_logger() -> logging.Logger:
+    """returns a logging.Logger Object"""
+    logger = logging.getLogger('user_data')
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    handler = logging.StreamHandler()
+    formatter = RedactingFormatter(PII_FIELDS)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
+
+
+def get_db() -> connector.connection.MySQLConnection:
+    """Get access to the database"""
+    host = os.environ.get("PERSONAL_DATA_DB_HOST")
+    user = os.environ.get("PERSONAL_DATA_DB_USERNAME")
+    password = os.environ.get("PERSONAL_DATA_DB_PASSWORD")
+    database = os.environ.get("PERSONAL_DATA_DB_NAME")
+
+    connection_state = connector.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=database
+    )
+
+    return connection_state
+
+
+def main() -> None:
+    """returns nothing"""
+    logger = get_logger()
+    db_connection = get_db()
+
+    cursor = db_connection.cursor(dictionary=True)
+    query = "SELECT * FROM users"
+    cursor.execute(query)
+
+    for row in cursor.fetchall():
+        message = "; ".join([f"{key}={value}" for key, value in row.items()])
+        logger.info(message)
+
+    cursor.close()
+    db_connection.close()
+
+
+if __name__ == '__main__':
+    """run the main programme"""
     main()
