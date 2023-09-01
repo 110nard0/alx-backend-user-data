@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""filtered logger module"""
+"""Filtered Logger Module"""
 
 from typing import List
 import logging
