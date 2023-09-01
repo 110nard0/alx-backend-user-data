@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """filtered_logger module"""
 
-from os import environ
 from typing import List
 import logging
 import mysql.connector
-# import os
+import os
 import re
 
 # User PII fields to be redacted
@@ -38,10 +37,10 @@ def get_logger() -> logging.Logger:
 
 def get_db() -> mysql.connector.connection.MySQLConnection:
     """Creates a MySQL database connection object"""
-    db_host = environ.get("PERSONAL_DATA_DB_HOST", "localhost")
-    db_user = environ.get("PERSONAL_DATA_DB_USERNAME", "root")
-    db_pwd = environ.get("PERSONAL_DATA_DB_PASSWORD", "")
-    db_name = environ.get("PERSONAL_DATA_DB_NAME")
+    db_host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
+    db_user = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    db_pwd = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    db_name = os.getenv("PERSONAL_DATA_DB_NAME")
 
     db = mysql.connector.connect(
         host=db_host,
