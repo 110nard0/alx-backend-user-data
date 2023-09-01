@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """filtered_logger module"""
 
+# from os import environ
 from typing import List
 import logging
 import mysql.connector
@@ -42,7 +43,7 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
     db_pwd = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
     db_name = os.getenv("PERSONAL_DATA_DB_NAME")
 
-    db = mysql.connector.connect(
+    db = mysql.connector.connection.MySQLConnection(
         host=db_host,
         port=3306,
         user=db_user,
