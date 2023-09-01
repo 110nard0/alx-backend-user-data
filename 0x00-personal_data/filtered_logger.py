@@ -5,6 +5,7 @@ import logging
 import re
 from typing import List
 
+# User PII fields to be redacted
 PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
 
 
@@ -22,13 +23,13 @@ def get_logger() -> logging.Logger:
     """Creates a Logger object with a StreamHandler"""
     logger = logging.getLogger("user_data")
     logger.setLevel(logging.INFO)
+    logger.propagate = False
  
-    formatter = RedactingFormatter(fields=PII_FIELDS)
-    handler = logging.StreamHandler
+    formatter = RedactingFormatter(PII_FIELDS)
+    handler = logging.StreamHandler()
     handler.setFormatter(formatter)
 
     logger.addHandler(handler)
-    logger.propagate = False
     return logger
 
 
