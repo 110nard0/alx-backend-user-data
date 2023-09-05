@@ -3,7 +3,6 @@
 Route module for the API
 """
 from api.v1.views import app_views
-
 from flask import Flask, jsonify, abort, request
 from flask_cors import (CORS, cross_origin)
 from os import getenv
@@ -32,7 +31,6 @@ def filter_request():
                 abort(401)
             if not auth.current_user(request):
                 abort(403)
-        return
 
 
 @app.errorhandler(401)
