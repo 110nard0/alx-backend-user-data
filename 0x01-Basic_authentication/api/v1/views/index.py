@@ -27,9 +27,18 @@ def stats() -> str:
 
 
 @app_views.route('/unauthorized', strict_slashes=False)
-def raise_unauthorized() -> str:
+def raise_unauthorized() -> None:
     """ Test unauthorized error handler
     Return:
       - 401 error
     """
     abort(401)
+
+
+@app_views.route('/forbidden', strict_slashes=False)
+def raise_forbidden() -> None:
+    """ Test forbidden error handler
+    Return:
+      - 403 error
+    """
+    abort(403)
