@@ -19,20 +19,20 @@ auth = None
 def filter_request():
     """ Filter requests
     """
-    excluded_paths = [
-                      '/api/v1/status/',
-                      '/api/v1/unauthorized/',
-                      '/api/v1/forbidden/'
-                     ]
-
     if auth is None:
         pass
-    if not auth.require_auth(request.path, excluded_paths):
+    else:
+        excluded_paths = [
+                          '/api/v1/status/',
+                          '/api/v1/unauthorized/',
+                          '/api/v1/forbidden/'
+                         ]
+        if auth.require_auth(request.path, excluded_paths):
+           if not auth.authorization_header(request):
+                abort(401)
+           if not auth.current_user(request):
+                abort(403)
         return
-    if not auth.authorization_header(request):
-        abort(401)
-    if auth.current_user(request):
-        abort(403)
 
 
 @app.errorhandler(401)
@@ -60,6 +60,7 @@ if __name__ == "__main__":
     host = getenv("API_HOST", "0.0.0.0")
     port = getenv("API_PORT", 5000)
     auth_type = getenv("AUTH_TYPE")
+
     if auth_type == "auth":
         from api.v1.auth.auth import Auth
         auth = Auth()
