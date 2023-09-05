@@ -21,7 +21,9 @@ class Auth:
     def authorization_header(self, request=None) -> str:
         """Validates requests to secure API
         """
-        return request
+        if request and request.headers.get('Authorization'):
+            return request.headers['Authorization']
+        return None
 
     def current_user(self, request=None) -> TypeVar('User'):
         """Authenticates current user for request
