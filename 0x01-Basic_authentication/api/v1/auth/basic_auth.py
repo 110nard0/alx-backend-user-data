@@ -63,7 +63,7 @@ class BasicAuth(Auth):
                         and user.is_valid_password(user_pwd):
                     return user
         except Exception:
-                return None
+            return None
 
     def current_user(self, request=None) -> TypeVar('User'):
         """Overloads Auth class and retrieves the User instance for a request
