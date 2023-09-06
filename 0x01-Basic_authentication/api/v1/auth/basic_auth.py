@@ -28,7 +28,7 @@ class BasicAuth(Auth):
         """
         if base64_authorization_header is None\
                 or type(base64_authorization_header) is not str:
-           return None
+            return None
         try:
             return base64.b64decode(
                           base64_authorization_header).decode('utf-8')
