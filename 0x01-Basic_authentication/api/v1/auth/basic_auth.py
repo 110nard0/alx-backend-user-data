@@ -69,11 +69,11 @@ class BasicAuth(Auth):
         if auth_header:
             header = self.extract_base64_authorization_header(auth_header)
             if header:
-                decoded_header = self.decode_base64_authorization_header(header)
-                if decoded_header:
-                    credentials = self.extract_user_credentials(decoded_header)
-                    if credentials:
-                        user = self.user_object_from_credentials(credentials[0],
-                                                                 credentials[1])
+                decode_header = self.decode_base64_authorization_header(header)
+                if decode_header:
+                    credential = self.extract_user_credentials(decoded_header)
+                    if credential:
+                        user = self.user_object_from_credentials(credential[0],
+                                                                 credential[1])
                         return user
         return
