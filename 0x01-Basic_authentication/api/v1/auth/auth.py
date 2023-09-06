@@ -12,9 +12,13 @@ class Auth:
         """Confirm path route in list of excluded paths
         """
         slashed_path = f'{path}/' if path and not path.endswith('/') else path
+
         if not path or not excluded_paths:
             return True
-        elif path not in excluded_paths and slashed_path not in excluded_paths:
+        for route in excluded_paths:
+            if route.endswith('*') and path.startswith(route[:-1]):
+                return False
+        if path not in excluded_paths and slashed_path not in excluded_paths:
             return True
         return False
 
