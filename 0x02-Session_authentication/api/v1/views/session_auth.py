@@ -49,7 +49,6 @@ def login_user() -> str:
 
                 session_id = auth.create_session(user.id)
                 response = jsonify(user.to_json())
-                print(type(response))
                 response.set_cookie(SESSION_NAME, session_id)
                 return response
         else:
@@ -67,6 +66,6 @@ def logout_user() -> str:
     """
     from api.v1.app import auth
 
-    if not auth.destroy_session(request)
+    if not auth.destroy_session(request):
         abort(404)
     return jsonify({}), 200
