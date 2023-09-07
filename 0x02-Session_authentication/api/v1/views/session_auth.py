@@ -2,7 +2,7 @@
 """ Module of Session Authentication views
 """
 from api.v1.views import app_views
-from flask import jsonify, request
+from flask import abort, jsonify, request
 from models.user import User
 from os import getenv
 
@@ -49,8 +49,25 @@ def login_user() -> str:
 
                 session_id = auth.create_session(user.id)
                 response = jsonify(user.to_json())
+                print(type(response))
                 response.set_cookie(SESSION_NAME, session_id)
                 return response
         else:
             error_msg = "no user found for this email"
             return jsonify({'error': error_msg}), 404
+
+
+@app_views.route('/auth_session/logout', methods=['DELETE'],
+                 strict_slashes=False)
+def logout_user() -> str:
+    """ DELETE /api/v1/auth_session/logout
+    Return:
+      - empty JSON if the user session has been correctly destroyed
+      - 404 if the User ID and/or Session ID are null
+    """
+    from api.v1.app import auth
+
+    result = auth.destroy_session(request)
+    if not result:
+        abort(404)
+    return jsonify({}), 200
