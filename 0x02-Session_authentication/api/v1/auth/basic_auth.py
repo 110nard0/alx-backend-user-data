@@ -9,7 +9,7 @@ import base64
 
 
 class BasicAuth(Auth):
-    """BasicAuth class inherit from Auth class and implements the
+    """BasicAuth class inherits from Auth class and implements the
     WWW Basic Authentication scheme
     """
     def extract_base64_authorization_header(self, authorization_header:
