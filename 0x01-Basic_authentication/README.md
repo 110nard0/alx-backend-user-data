@@ -1,4 +1,5 @@
 # Basic Authentication
+Adds Basic Authentication to the Simple API.
 
 ## Simple API
 
