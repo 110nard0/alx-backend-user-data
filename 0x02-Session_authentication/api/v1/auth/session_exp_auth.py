@@ -7,7 +7,6 @@ from models.user import User
 
 from datetime import datetime, timedelta
 from os import getenv
-from uuid import uuid4
 
 
 class SessionExpAuth(SessionAuth):
