@@ -28,11 +28,8 @@ class SessionDBAuth(SessionExpAuth):
             return None
         UserSession.load_from_file()
         uid = super().user_id_for_session_id(session_id)
-        if UserSession.search({'session_id': session_id}):
-            pass
-        else:
-            if uid is None:
-                return None
+        if uid is None:
+            return None
         if not UserSession.all():
             return None
         sessions = UserSession.search({'session_id': session_id})
