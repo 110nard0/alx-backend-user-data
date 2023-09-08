@@ -29,8 +29,11 @@ class SessionDBAuth(SessionExpAuth):
             return None
         if not UserSession.all():
             return None
-        session = UserSession.search({'session_id': session_id})[0]
-        return session.user_id
+        sessions = UserSession.search({'session_id': session_id})
+        if sessions:
+            session = sessions[0]
+            return session.user_id
+        return None
 
     def destroy_session(self, request=None) -> bool:
         """Destroy a valid UserSession based on Session ID in request cookie
@@ -47,3 +50,4 @@ class SessionDBAuth(SessionExpAuth):
         if sessions:
             sessions[0].remove()
             return True
+        return False
