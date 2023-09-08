@@ -33,7 +33,6 @@ class SessionDBAuth(SessionExpAuth):
         if sessions:
             session = sessions[0]
             return session.user_id
-        return None
 
     def destroy_session(self, request=None) -> bool:
         """Destroy a valid UserSession based on Session ID in request cookie
