@@ -57,5 +57,5 @@ class DB:
             if user is None:
                 raise NoResultFound
             return user
-        except InvalidRequestError:
-            raise
+        except AttributeError:
+            raise InvalidRequestError
