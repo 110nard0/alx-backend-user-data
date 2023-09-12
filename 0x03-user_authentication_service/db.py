@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """DB module
 """
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
+from typing import Dict
 
 from user import Base, User
 
@@ -41,3 +44,18 @@ class DB:
         self._session.add(user)
         self._session.commit()
         return user
+
+    def find_user_by(self, **kwargs) -> User:
+        """Return user with attribute(s) matching keyword argument(s)
+        Args:
+            attributes (dict): a dictionary of attributes to match the user
+        Return:
+            Matching user or raised error if user not found
+        """
+        try:
+            user = self._session.query(User).filter_by(**kwargs).first()
+            if user is None:
+                raise NoResultFound
+            return user
+        except InvalidRequestError:
+            raise
