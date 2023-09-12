@@ -60,7 +60,6 @@ class DB:
         except AttributeError:
             raise InvalidRequestError
 
-
     def update_user(self, user_id: int, **kwargs) -> None:
         """Update found user's attributes
         Args:
@@ -71,16 +70,14 @@ class DB:
             None
         """
         try:
-            user = self._session.query(User).filter(User.id == int(user_id))
+            user = self.find_user_by(id=int(user_id))
             if user is None:
                 raise NoResultFound
-            for k, v in kwargs.items():
-                if k not in User.__dict__:
+            for key, value in kwargs.items():
+                if hasattr(user, key):
+                    setattr(user, key, value)
+                else:
                     raise InvalidRequestError
-                for key in user.__dict__:
-                    if k == key:
-                        setattr(user, k, v)
             self._session.commit()
-            return None
         except ValueError:
             raise
