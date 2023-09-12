@@ -71,13 +71,12 @@ class DB:
         """
         try:
             user = self.find_user_by(id=int(user_id))
-            if user is None:
-                raise NoResultFound
-            for key, value in kwargs.items():
-                if hasattr(user, key):
-                    setattr(user, key, value)
-                else:
-                    raise InvalidRequestError
-            self._session.commit()
-        except ValueError:
-            raise
+        except NoResultFound:
+            raise ValueError
+            
+        for key, value in kwargs.items():
+            if hasattr(user, key):
+                setattr(user, key, value)
+            else:
+                raise ValueError
+        self._session.commit()
