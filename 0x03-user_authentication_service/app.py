@@ -67,7 +67,7 @@ def login() -> str:
         abort(401, description="Invalid username or password")
 
 
-@app.route('/sessions', methods=['DELETE'], strict_slashes=False)
+@app.route('/sessions', methods=['POST, DELETE'], strict_slashes=False)
 def logout() -> None:
     """ DELETE '/sessions'
     Request body:
