@@ -81,9 +81,21 @@ class Auth:
         else:
             return user
 
+    def destroy_session(user_id: int) -> None:
+        """Destroys user session
+        Args:
+            user_id (int): unique auto-generated database User ID
+        """
+        try:
+            user = self._db.find_user_by(id=user_id)
+        except Exception:
+            raise
+        else:
+            user.session_id = None
+
 
 def _generate_uuid() -> str:
-    """Generate string represntation of UUID
+    """Generate string representation of UUID
     Return:
         (str): uuid object represented as a string
     """
