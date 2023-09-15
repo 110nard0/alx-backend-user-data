@@ -28,7 +28,7 @@ class Auth:
         try:
             user = self._db.find_user_by(email=email)
         except NoResultFound:
-            new_user = self._db.add_user(email, password)
+            new_user = self._db.add_user(email, _hash_password(password))
             return new_user
         else:
             raise ValueError(f'User {email} already exists')
@@ -43,8 +43,8 @@ class Auth:
         """
         try:
             user = self._db.find_user_by(email=email)
-            if bcrypt.checkpw(user.hashed_password.encode(),
-                              _hash_password(password)):
+            if bcrypt.checkpw(password.encode(),
+                              user.hashed_password):
                 return True
             return False
         except NoResultFound:
