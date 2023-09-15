@@ -19,6 +19,21 @@ def index() -> str:
     return jsonify({"message": "Bienvenue"}), 200
 
 
+@app.route('/profile', methods=['GET'], strict_slashes=False)
+def profile() -> str:
+    """ GET '/profile'
+    Request body:
+      - session_id
+    Return:
+      - User JSON object
+    """
+    session_cookie = request.cookies.get('session_id')
+    user = AUTH.get_user_from_session_id(session_cookie)
+    if session_cookie is None or user is None:
+        abort(403, description="Invalid user")
+    return jsonify({"email": user.email})
+
+
 @app.route('/users', methods=['POST'], strict_slashes=False)
 def register() -> str:
     """ POST '/users'
@@ -78,7 +93,7 @@ def logout() -> None:
     if session_cookie is None or user is None:
         abort(403, description="Invalid user")
     AUTH.destroy_session(user.id)
-    return redirect('/')
+    return redirect('/', 302)
 
 
 @app.errorhandler(404)
