@@ -2,7 +2,7 @@
 """ Flask app module
 """
 from auth import Auth
-from flask import abort, Flask, jsonify, request
+from flask import abort, Flask, jsonify, redirect, request
 
 
 app = Flask(__name__)
@@ -92,8 +92,9 @@ def logout() -> None:
     user = AUTH.get_user_from_session_id(session_cookie)
     if session_cookie is None or user is None:
         abort(403, description="Invalid user")
-    AUTH.destroy_session(user.id)
-    return redirect('/', 302)
+    else:
+        AUTH.destroy_session(user.id)
+        return redirect('/', 302)
 
 
 @app.route('/reset_password', methods=['POST'], strict_slashes=False)
