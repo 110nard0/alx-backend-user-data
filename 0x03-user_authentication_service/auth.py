@@ -66,7 +66,7 @@ class Auth:
             user.session_id = _generate_uuid()
             return user.session_id
 
-    def get_user_from_session_id(session_id: str) -> Union[User, None]:
+    def get_user_from_session_id(self, session_id: str) -> Union[User, None]:
         """Fetch user using Session ID
         Args:
             session_id (str): unique string associated with particular user
@@ -77,21 +77,21 @@ class Auth:
             return None
         try:
             user = self._db.find_user_by(session_id=session_id)
-        except NoResultFound:
+        except Exception:
             return None
-        return user
+        else:
+            return user
 
-    def destroy_session(user_id: int) -> None:
+    def destroy_session(self, user_id: int) -> None:
         """Destroys user session
         Args:
             user_id (int): unique auto-generated database User ID
         """
         try:
-            user = self._db.find_user_by(id=user_id)
-        except Exception:
+            user = self._db.update_user(user_id, session_id=None)
+        except ValueError:
             return None
-        else:
-            user.session_id = None
+        return None
 
 
 def _generate_uuid() -> str:
