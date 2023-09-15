@@ -96,6 +96,27 @@ def logout() -> None:
     return redirect('/', 302)
 
 
+@app.route('/reset_password', methods=['POST'], strict_slashes=False)
+def get_reset_token() -> str:
+    """ POST '/reset_password'
+    Return:
+      -
+    """
+    email = request.form.get('email', '')
+    if not email:
+        abort(401, description="Invalid credentials")
+
+    try:
+        reset_token = AUTH.get_reset_password_token(email)
+    except ValueError:
+        abort(403, description="User not registered")
+    else:
+        return jsonify({
+                        "email": email,
+                        "reset_token": reset_token
+                       }), 200
+
+
 @app.errorhandler(404)
 def not_found(error) -> str:
     """ Handle 404 error
