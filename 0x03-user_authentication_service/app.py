@@ -1,20 +1,44 @@
 #!/usr/bin/env python3
 """ Flask app module
 """
-from flask import Flask, jsonify
+from auth import Auth
+from flask import Flask, jsonify, request
 
 
 app = Flask(__name__)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+AUTH = Auth()
 
 
 @app.route('/', methods=['GET'], strict_slashes=False)
 def greet() -> str:
     """ GET '/'
     Return:
-      - JSON body
+      - JSON object
     """
     return jsonify({"message": "Bienvenue"}), 200
+
+
+@app.route('/users', methods=['POST'], strict_slashes=False)
+def create_user() -> str:
+    """ POST '/'
+    JSON body:
+      - email
+      - password
+    Return:
+      - User JSON object
+    """
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    try:
+        user = AUTH.register_user(email, password)
+        return jsonify({
+                        "email": user.email,
+                        "message": "user created"
+                       })
+    except ValueError:
+        return jsonify({"message": "email already registered"})
 
 
 @app.errorhandler(404)
