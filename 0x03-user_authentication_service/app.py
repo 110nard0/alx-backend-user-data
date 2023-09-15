@@ -130,7 +130,7 @@ def update_password() -> str:
       - User JSON object with email and status message
     """
     email = request.form.get('email', '')
-    reset_token = request.form.get('reset_password', '')
+    reset_token = request.form.get('reset_token', '')
     new_password = request.form.get('new_password', '')
     if not email or not reset_token or not new_password:
         abort(401, description="Invalid request form data")
