@@ -2,7 +2,7 @@
 """ Flask app module
 """
 from auth import Auth
-from flask import Flask, jsonify, request
+from flask import abort, Flask, jsonify, request
 
 
 app = Flask(__name__)
@@ -21,7 +21,7 @@ def greet() -> str:
 
 @app.route('/users', methods=['POST'], strict_slashes=False)
 def create_user() -> str:
-    """ POST '/'
+    """ POST '/users'
     JSON body:
       - email
       - password
@@ -39,6 +39,33 @@ def create_user() -> str:
                        })
     except ValueError:
         return jsonify({"message": "email already registered"})
+
+
+@app.route('/sessions', methods=['POST'], strict_slashes=False)
+def register_session() -> str:
+    """ POST '/sessions'
+    JSON body:
+      - email
+      - password
+    Return:
+      - User JSON object with login status
+    """
+    email = request.form.get('email', '')
+    password = request.form.get('password', '')
+    if not email or not password:
+        abort(401, description="Invalid request data")
+
+    if AUTH.valid_login(email, password):
+        print('?')
+        session_id = AUTH.create_session(email)
+        response = jsonify({
+                            "email": email,
+                            "message": "logged in"
+                           })
+        response.set_cookie("session_id", session_id)
+        return response, 200
+    else:
+        abort(401, description="Invalid username or password")
 
 
 @app.errorhandler(404)
