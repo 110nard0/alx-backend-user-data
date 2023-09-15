@@ -73,13 +73,13 @@ def logout() -> None:
     Request body:
       - session_id
     """
-    session_cookie = request.cookies.get('session_id')
+    session_cookie = request.cookies.get('session_id', None)
     user = AUTH.get_user_from_session_id(session_cookie)
-    if user:
-        del request.session.cookies['session_id']
-        return redirect('/', 200)
-    else:
+    if session_cookie is None or user is None:
         abort(403, description="Invalid user")
+    else:
+        AUTH.destroy_session(user.id)
+        return redirect('/', 200)
 
 
 @app.errorhandler(404)
