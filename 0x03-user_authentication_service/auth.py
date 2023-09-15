@@ -4,6 +4,7 @@
 import bcrypt
 import uuid
 from sqlalchemy.orm.exc import NoResultFound
+from typing import Union
 
 from db import DB
 from user import User
@@ -65,7 +66,7 @@ class Auth:
             user.session_id = _generate_uuid()
             return user.session_id
 
-    def get_user_from_session_id(session_id: str) -> User:
+    def get_user_from_session_id(session_id: str) -> Union[User, None]:
         """Fetch user using Session ID
         Args:
             session_id (str): unique string associated with particular user
@@ -76,9 +77,9 @@ class Auth:
             return None
         try:
             user = self._db.find_user_by(session_id=session_id)
-            return user
-        except Exception:
+        except NoResultFound:
             return None
+        return user
 
     def destroy_session(user_id: int) -> None:
         """Destroys user session
