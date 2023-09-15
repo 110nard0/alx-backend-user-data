@@ -14,7 +14,7 @@ AUTH = Auth()
 def index() -> str:
     """ GET '/'
     Return:
-      - JSON object
+      - JSON string
     """
     return jsonify({"message": "Bienvenue"}), 200
 
@@ -25,7 +25,7 @@ def profile() -> str:
     Request body:
       - session_id
     Return:
-      - User JSON object
+      - User JSON object with email field
     """
     session_cookie = request.cookies.get('session_id')
     user = AUTH.get_user_from_session_id(session_cookie)
@@ -41,7 +41,7 @@ def register() -> str:
       - email
       - password
     Return:
-      - User JSON object
+      - User JSON object with email and status message
     """
     email = request.form.get('email')
     password = request.form.get('password')
@@ -63,12 +63,12 @@ def login() -> str:
       - email
       - password
     Return:
-      - User JSON object with login status
+      - User JSON object with email and login status
     """
     email = request.form.get('email', '')
     password = request.form.get('password', '')
     if not email or not password:
-        abort(401, description="Invalid request data")
+        abort(401, description="Invalid request form data")
 
     if AUTH.valid_login(email, password):
         session_id = AUTH.create_session(email)
@@ -99,8 +99,10 @@ def logout() -> None:
 @app.route('/reset_password', methods=['POST'], strict_slashes=False)
 def get_reset_token() -> str:
     """ POST '/reset_password'
+    Request body:
+      - email
     Return:
-      -
+      - User JSON object with email and reset_token fields
     """
     email = request.form.get('email', '')
     if not email:
@@ -114,6 +116,33 @@ def get_reset_token() -> str:
         return jsonify({
                         "email": email,
                         "reset_token": reset_token
+                       }), 200
+
+
+@app.route('/reset_password', methods=['PUT'], strict_slashes=False)
+def update_password() -> str:
+    """ PUT '/reset_password'
+    Request body:
+      - email
+      - reset_token
+      - new_password
+    Return:
+      - User JSON object with email and status message
+    """
+    email = request.form.get('email')
+    reset_token = request.form.get('reset_password')
+    new_password = request.form.get('new_password')
+    if not email or not reset_token or not password:
+        abort(401, description="Invalid request form data")
+
+    try:
+        AUTH.update_password(reset_token, new_password)
+    except ValueError:
+        abort(403, description="User not registered")
+    else:
+        return jsonify({
+                        "email": email,
+                        "message": "Password updated"
                        }), 200
 
 
