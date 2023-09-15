@@ -2,7 +2,9 @@
 """ Auth module
 """
 import bcrypt
+import uuid
 from sqlalchemy.orm.exc import NoResultFound
+
 from db import DB
 from user import User
 
@@ -49,15 +51,12 @@ class Auth:
             return False
 
 
-"""
-In this task, you will implement the Auth.valid_login method.
-It should expect email and password required arguments and return a boolean.
-
-Try locating the user by email.
-If it exists, check the password with bcrypt.checkpw.
-If it matches return True. In any other case, return False.
-"""
-
+def _generate_uuid() -> str:
+    """Generate string represntation of UUID
+    Return:
+        (str): uuid object represented as a string
+    """
+    return str(uuid.uuid4())
 
 def _hash_password(password: str) -> bytes:
     """Hash password input
