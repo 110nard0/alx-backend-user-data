@@ -11,7 +11,7 @@ AUTH = Auth()
 
 
 @app.route('/', methods=['GET'], strict_slashes=False)
-def greet() -> str:
+def index() -> str:
     """ GET '/'
     Return:
       - JSON object
@@ -20,7 +20,7 @@ def greet() -> str:
 
 
 @app.route('/users', methods=['POST'], strict_slashes=False)
-def create_user() -> str:
+def register() -> str:
     """ POST '/users'
     JSON body:
       - email
@@ -42,7 +42,7 @@ def create_user() -> str:
 
 
 @app.route('/sessions', methods=['POST'], strict_slashes=False)
-def register_session() -> str:
+def login() -> str:
     """ POST '/sessions'
     JSON body:
       - email
@@ -65,6 +65,21 @@ def register_session() -> str:
         return response, 200
     else:
         abort(401, description="Invalid username or password")
+
+
+@app.route('/sessions', methods=['DELETE'], strict_slashes=False)
+def logout() -> None:
+    """ DELETE '/sessions'
+    Request body:
+      - session_id
+    """
+    session_cookie = request.cookies.get('session_id')
+    user = AUTH.get_user_from_session_id(session_cookie)
+    if user:
+        del request.session.cookies['session_id']
+        return redirect('/', 200)
+    else:
+        abort(403, description="Invalid user")
 
 
 @app.errorhandler(404)
