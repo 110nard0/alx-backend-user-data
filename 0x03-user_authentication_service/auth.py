@@ -65,6 +65,22 @@ class Auth:
             user.session_id = _generate_uuid()
             return user.session_id
 
+    def get_user_from_session_id(session_id: str) -> User:
+        """Fetch user using Session ID
+        Args:
+            session_id (str): unique string associated with particular user
+        Return:
+            (User) object with session_id attribute (SUCCESS) or None (FAIL)
+        """
+        if session_id is None:
+            return None
+        try:
+            user = self._db.find_user_by(session_id=session_id)
+        except Exception:
+            return None
+        else:
+            return user
+
 
 def _generate_uuid() -> str:
     """Generate string represntation of UUID
