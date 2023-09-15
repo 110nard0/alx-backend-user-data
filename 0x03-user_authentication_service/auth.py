@@ -115,7 +115,7 @@ class Auth:
             password (str): user password
         """
         try:
-            user = self._db.find_user(reset_token=reset_token)
+            user = self._db.find_user_by(reset_token=reset_token)
         except Exception:
             raise ValueError
         else:
