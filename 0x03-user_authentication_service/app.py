@@ -79,7 +79,7 @@ def logout() -> None:
         abort(403, description="Invalid user")
     else:
         AUTH.destroy_session(user.id)
-        return redirect('/', 200)
+        return redirect('/', 302)
 
 
 @app.errorhandler(404)
