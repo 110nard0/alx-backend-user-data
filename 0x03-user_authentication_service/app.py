@@ -56,7 +56,6 @@ def register_session() -> str:
         abort(401, description="Invalid request data")
 
     if AUTH.valid_login(email, password):
-        print('?')
         session_id = AUTH.create_session(email)
         response = jsonify({
                             "email": email,
