@@ -93,6 +93,21 @@ class Auth:
             return None
         return None
 
+    def get_reset_password_token(email: str) -> str:
+        """Generate user reset password token
+        Args:
+            email (str): returning user's email address
+        Return:
+            reset_token (str): unique string for user to reset password
+        """
+        try:
+            user = self._db.find_user_by(email=email)
+        except Exception:
+            raise ValueError
+        else:
+            user.reset_token = _generate_uuid()
+            return user.reset_token
+
 
 def _generate_uuid() -> str:
     """Generate string representation of UUID
