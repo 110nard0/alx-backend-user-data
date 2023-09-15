@@ -67,7 +67,7 @@ def login() -> str:
         abort(401, description="Invalid username or password")
 
 
-@app.route('/sessions', methods=['POST, DELETE'], strict_slashes=False)
+@app.route('/sessions', methods=['DELETE'], strict_slashes=False)
 def logout() -> None:
     """ DELETE '/sessions'
     Request body:
@@ -77,9 +77,8 @@ def logout() -> None:
     user = AUTH.get_user_from_session_id(session_cookie)
     if session_cookie is None or user is None:
         abort(403, description="Invalid user")
-    else:
-        AUTH.destroy_session(user.id)
-        return redirect('/', 302)
+    AUTH.destroy_session(user.id)
+    return redirect('/')
 
 
 @app.errorhandler(404)
